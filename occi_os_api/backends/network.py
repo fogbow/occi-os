@@ -163,14 +163,18 @@ class NetworkInterfaceBackend(backend.KindBackend):
         # TODO: attributes
         if link.source.kind == infrastructure.COMPUTE \
                 and link.target.kind == infrastructure.NETWORK:
-            src = link.source.attributes['occi.core.id']
-            trg = link.target.attributes['occi.core.id']
-            tmp = neutron.add_floating_ip(extras['nova_ctx'], src, trg)
-            if tmp is not None:
-                # float ip
-                link.attributes['occi.core.id'] = tmp['floatingip']['id']
+            if 'occi.core.id' in link.source.attributes: 
+                src = link.source.attributes['occi.core.id']
+                trg = link.target.attributes['occi.core.id']
+                tmp = neutron.add_floating_ip(extras['nova_ctx'], src, trg)
+                if tmp is not None:
+                    # float ip
+                    link.attributes['occi.core.id'] = tmp['floatingip']['id']
+                else:
+                    # vnic
+                    pass
             else:
-                # vnic
+                # Inline creation of link
                 pass
         elif link.source.kind == infrastructure.NETWORK \
                 and link.target.kind == infrastructure.NETWORK:
